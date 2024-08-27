@@ -369,18 +369,20 @@ class YOLOSampler(YOLOFormatMerge):
 
 
 if __name__ == "__main__":
-    merger = YOLOFormatMerge()
-    merger.convert()
-    merger = YOLOImageLableFormatMerge()
-    merger.convert()
-    merger = VOCFormatMerge()
-    merger.convert()
-    merger = VOCFormatMerge(input_dir="datasets/fire_smoke_data_set/bd_fire/VOC2020")
-    merger.convert()
-    merge = VOCFormatMerge(input_dir="datasets/fire_smoke_data_set/bd_fire/fire_smoke")
-    merge.image_dir = "images"
-    merge.annotation_dir = "annotations"
-    merge.convert()
-
-    converter = YOLO2VitFormatConverter()
-    converter.convert()
+    # merger = YOLOFormatMerge()
+    # merger.convert()
+    # merger = YOLOImageLableFormatMerge()
+    # merger.convert()
+    # merger = VOCFormatMerge()
+    # merger.convert()
+    # merger = VOCFormatMerge(input_dir="datasets/fire_smoke_data_set/bd_fire/VOC2020")
+    # merger.convert()
+    # merge = VOCFormatMerge(input_dir="datasets/fire_smoke_data_set/bd_fire/fire_smoke")
+    # merge.image_dir = "images"
+    # merge.annotation_dir = "annotations"
+    # merge.convert()
+    #
+    # converter = YOLO2VitFormatConverter()
+    # converter.convert()
+    sampler = YOLOSampler()
+    sampler.sample()
