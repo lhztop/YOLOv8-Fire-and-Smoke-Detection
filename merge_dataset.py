@@ -330,6 +330,8 @@ class YOLOSampler(YOLOFormatMerge):
     output_dir: str = 'datasets/output'
 
     ratio = {"train":7, "val": 2, "test":1}
+    label_dir = "labels"
+    image_dir = "images"
 
     def __init__(self, input_dir:str = 'datasets/merge', output_dir:str = 'datasets/output'):
         super().__init__(input_dir, output_dir)
@@ -351,7 +353,7 @@ class YOLOSampler(YOLOFormatMerge):
         start_idx = 0
         import shutil, pathlib
         for dir in ["train", "val", "test"]:
-            end_idx = start_idx + counts(dir)
+            end_idx = start_idx + counts[dir]
             if "test" == dir:
                 end_idx = -1
             sample_files = files[start_idx: end_idx]
@@ -360,12 +362,8 @@ class YOLOSampler(YOLOFormatMerge):
             for f in sample_files:
                 label_file_name_extension = pathlib.Path(f).suffix
                 shutil.copy(f, f"{self.output_dir}/{dir}/images")
-                shutil.copy(f.replace(f, label_file_name_extension, ".txt"), f"{self.output_dir}/{dir}/labels")
+                shutil.copy((f[:-len(label_file_name_extension)] + ".txt").replace(f"/{self.image_dir}/", f"/{self.label_dir}/"), f"{self.output_dir}/{dir}/labels")
             start_idx = end_idx
-
-
-
-
 
 
 if __name__ == "__main__":
