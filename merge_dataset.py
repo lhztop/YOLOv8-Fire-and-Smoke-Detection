@@ -355,9 +355,12 @@ class SmokeFireBenchmark(object):
         self.total_true = 0
         self.total_false = 0
         for f in files:
-            ext = pathlib.Path.suffix(f)
-            label_file_name = f.replace('/images/', '/labels/')[:-len(ext)] + "txt"
-            pred_result = self.get_yolo_predict(f)
+            ext = pathlib.Path(f).suffix
+            label_file_name = f.replace('/images/', '/labels/')[:-len(ext)] + ".txt"
+            if isinstance(self._model, tuple):
+                pred_result = self.get_vit_predict(f)
+            else:
+                pred_result = self.get_yolo_predict(f)
             true_result = yolo_val[label_file_name]
             self.calc_single_pre_true_score(pred_result, true_result)
         print(f" tp+tn should = total true, {self.tp+self.fn} = {self.total_true}, {self.tp + self.fn == self.total_true }")
