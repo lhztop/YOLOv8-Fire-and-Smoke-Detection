@@ -341,7 +341,7 @@ class YOLOSampler(YOLOFormatMerge):
             os.makedirs(f"{self.output_dir}/{dir}", exist_ok=True)
         random.shuffle(files)
         total = 0
-        for k, v in self.ratio:
+        for k, v in self.ratio.items():
             total += v
         train_count = int(self.ratio["train"] / total * len(files))
         val_count = int(self.ratio["val"] / total * len(files))
