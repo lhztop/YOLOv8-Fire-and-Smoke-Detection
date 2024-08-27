@@ -3,8 +3,12 @@ import logging
 import os.path
 import random
 import ultralytics
+from PIL import Image
+from typing import Literal
 
 from imagededup.methods import PHash
+import torch
+
 
 class YOLOFormatMerge(object):
     input_dir:str = 'datasets/fire_smoke_data_set/fireandsmoke'
@@ -253,9 +257,16 @@ class SmokeFireBenchmark(object):
     total_false:int = 0
 
 
-    def __init__(self, model:str = "train/best.pt", score_threshold: float = 0.45):
+    def __init__(self, model:str = "train/best.pt", score_threshold: float = 0.45, model_type: Literal["yolo", "google-vit"] = "yolo"):
         self._score_threshold = score_threshold
-        self._model = model
+        if model_type == "yolo":
+            from ultralytics import YOLO
+            self._model = YOLO(model)
+        else:
+            from transformers import ViTImageProcessor, ViTForImageClassification
+            image_processor = ViTImageProcessor.from_pretrained(model)
+            model = ViTForImageClassification.from_pretrained(model)
+            self._model = (image_processor, model)
 
     def get_yolo_label(self, val_dir:str=None):
         import glob
@@ -277,7 +288,40 @@ class SmokeFireBenchmark(object):
                 labels[f] = classes
 
     def get_yolo_predict(self, image_file_name:str):
-        return None
+        pred = self._model.predict(image_file_name)
+        if not pred or len(pred) == 0:
+            return None
+        ret = set()
+        for res in pred:
+            detection_count = res.boxes.shape[0]
+            for i in range(detection_count):
+                cls = int(res.boxes.cls[i].item())
+                name = res.names[cls]
+                confidence = float(res.boxes.conf[i].item())
+                if confidence >= self._score_threshold:
+                    ret.add(cls)
+        return ret
+
+    def get_vit_predict(self, image_file_name:str):
+        image = Image.open(image_file_name)
+        if image_file_name.lower().endswith(".png"):
+            image = image.convert("RGB")
+        image_processor, model = self._model
+        inputs = image_processor(images=image, return_tensors="pt")
+
+        inputs = {name: tensor.to('cuda') for name, tensor in inputs.items()}
+        outputs = model(**inputs)
+        res = torch.topk(outputs.logits.softmax(dim=-1), 5)
+        confidence = [x.item() for x in res[0][0, :]]
+        class_ids = [x.item() for x in res[1][0, :]]
+        class_list = [model.config.id2label[x] for x in class_ids]
+
+        # ret = {'class_id_list': class_ids, 'score_list': confidence, 'label_list': class_list}
+        ret = set()
+        for i in range(len(class_ids)):
+            if confidence[i] >= self._score_threshold:
+                ret.add(class_ids[i])
+        return ret
 
     def calc_single_pre_true_score(self, pre_result, true_result):
         for clss in true_result:
@@ -382,5 +426,11 @@ if __name__ == "__main__":
     #
     # converter = YOLO2VitFormatConverter()
     # converter.convert()
-    sampler = YOLOSampler()
-    sampler.sample()
+    # sampler = YOLOSampler()
+    # sampler.sample()
+    import sys
+    if len(sys.argv) < 3:
+        print("Usage: benchark model_name model_type\n, model_type: yolo|google-vit\n")
+        sys.exit(1)
+    benchmark = SmokeFireBenchmark(model=sys.argv[1], model_type=sys.argv[2])
+    benchmark.calc()
