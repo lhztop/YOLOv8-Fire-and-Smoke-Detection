@@ -286,6 +286,7 @@ class SmokeFireBenchmark(object):
                     raw_class = int(strs[0])
                     classes.add(raw_class)
                 labels[f] = classes
+        return labels
 
     def get_yolo_predict(self, image_file_name:str):
         pred = self._model.predict(image_file_name)
