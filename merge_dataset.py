@@ -301,6 +301,8 @@ class SmokeFireBenchmark(object):
                 confidence = float(res.boxes.conf[i].item())
                 if confidence >= self._score_threshold:
                     ret.add(cls)
+        if len(ret) == 0:
+            ret.add(1)
         return ret
 
     def get_vit_predict(self, image_file_name:str):
@@ -322,6 +324,8 @@ class SmokeFireBenchmark(object):
         for i in range(len(class_ids)):
             if confidence[i] >= self._score_threshold:
                 ret.add(class_ids[i])
+        if len(ret) <= 0:
+            ret.add(1)
         return ret
 
     def calc_single_pre_true_score(self, pre_result, true_result):
@@ -368,9 +372,9 @@ class SmokeFireBenchmark(object):
         header = ["Accuracy", "Precision", "Recall", "F1-score"]
         value = [(self.tp + self.tn) / (self.total_true + self.total_false), self.tp/(self.tp + self.fp), self.tp/self.total_true]
         value.append(value[1]*value[2]/(value[1] + value[2]))  # f1 = p*r/p+r
-        row_format = "{:>15}" * (len(header) + 1)
-        print(row_format, *header)
-        print(row_format, *value)
+        row_format = "{:>15}" * len(header)
+        print(row_format.format(*header))
+        print(row_format.format(*value))
 
 
 class YOLOSampler(YOLOFormatMerge):
