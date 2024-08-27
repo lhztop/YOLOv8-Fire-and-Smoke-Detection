@@ -10,5 +10,5 @@ roboflow:
   version: 8
   workspace: custom-thxhn
 test: ../test/images
-train: fire-8/train/images
-val: fire-8/valid/images
+train: ../train/images
+val: ../valid/images
