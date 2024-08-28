@@ -385,7 +385,8 @@ class SmokeFireBenchmark(object):
         header = ["Accuracy", "Precision", "Recall", "F1-score"]
         value = [(self.tp + self.tn) / (self.total_true + self.total_false), self.tp/(self.tp + self.fp), self.tp/self.total_true]
         value.append(2*value[1]*value[2]/(value[1] + value[2]))  # f1 = 2p*r/p+r = 2/(1/p+1/r)
-        row_format = "{:>15}" * len(header)
+        row_format = "{:>25}|" * len(header)
+        row_format = "|" + row_format
         print(row_format.format(*header))
         print(row_format.format(*value))
 
