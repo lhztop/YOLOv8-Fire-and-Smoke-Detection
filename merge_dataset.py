@@ -307,8 +307,7 @@ class SmokeFireBenchmark(object):
 
     def get_vit_predict(self, image_file_name:str):
         image = Image.open(image_file_name)
-        if image_file_name.lower().endswith(".png"):
-            image = image.convert("RGB")
+        image = image.convert("RGB")
         image_processor, model = self._model
         inputs = image_processor(images=image, return_tensors="pt")
 
