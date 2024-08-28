@@ -249,10 +249,10 @@ class Vit2VitFormatConverter(YOLO2VitFormatConverter):
 class SmokeFireBenchmark(object):
     _model = None
     _score_threshold = 0.45
-    fp:int = 0
-    fn:int = 0
-    tp:int = 0
-    tn:int = 0
+    fp:int = 0  # 预测为正，实际为负
+    fn:int = 0  # 预测为负，实际为正
+    tp:int = 0  # 预测为正，实际为正
+    tn:int = 0  # 预测为负，实际为负
     total_true:int = 0
     total_false:int = 0
 
@@ -329,6 +329,13 @@ class SmokeFireBenchmark(object):
         return ret
 
     def calc_single_pre_true_score(self, pre_result, true_result):
+        if 1 in true_result and len(true_result) > 1:
+            logging.error("default contains smoke or fire in true")
+            true_result.remove(1)
+        if 1 in pre_result and len(pre_result) > 1:
+            logging.error("default contains smoke or fire in predict")
+            pre_result.remove(1)
+
         for clss in true_result:
             if clss == 1:
                 self.total_false += 1
@@ -337,14 +344,14 @@ class SmokeFireBenchmark(object):
         for pre_clss in pre_result:
             if pre_clss == 1:
                 if pre_clss in true_result:
-                    self.fp += 1
+                    self.tn += 1
                 else:
                     self.fn += 1
             else:
                 if pre_clss in true_result:
                     self.tp += 1
                 else:
-                    self.tn += 1
+                    self.fp += 1
 
 
     def calc(self, val_dir:str="datasets/output/val"):
