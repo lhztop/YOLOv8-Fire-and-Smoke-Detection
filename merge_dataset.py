@@ -328,13 +328,19 @@ class SmokeFireBenchmark(object):
             ret.add(1)
         return ret
 
-    def calc_single_pre_true_score(self, pre_result, true_result):
+    def calc_single_pre_true_score(self, pre_result, true_result, merge_smoke_fire_2_fire:bool=True):
         if 1 in true_result and len(true_result) > 1:
             logging.error("default contains smoke or fire in true")
             true_result.remove(1)
+
         if 1 in pre_result and len(pre_result) > 1:
             logging.error("default contains smoke or fire in predict")
             pre_result.remove(1)
+        if merge_smoke_fire_2_fire:
+            if 0 in true_result and 2 in true_result:
+                true_result.remove(2)
+            if 0 in pre_result and 2 in pre_result:
+                pre_result.remove(2)
 
         for clss in true_result:
             if clss == 1:
@@ -378,7 +384,7 @@ class SmokeFireBenchmark(object):
         print(f" tp+tn should = total true, {self.tp+self.fn} = {self.total_true}, {self.tp + self.fn == self.total_true }")
         header = ["Accuracy", "Precision", "Recall", "F1-score"]
         value = [(self.tp + self.tn) / (self.total_true + self.total_false), self.tp/(self.tp + self.fp), self.tp/self.total_true]
-        value.append(value[1]*value[2]/(value[1] + value[2]))  # f1 = p*r/p+r
+        value.append(2*value[1]*value[2]/(value[1] + value[2]))  # f1 = 2p*r/p+r = 2/(1/p+1/r)
         row_format = "{:>15}" * len(header)
         print(row_format.format(*header))
         print(row_format.format(*value))
