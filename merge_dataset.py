@@ -341,7 +341,7 @@ class SmokeFireBenchmark(object):
                 true_result.remove(2)
             if 0 in pre_result and 2 in pre_result:
                 pre_result.remove(2)
-        print(f"pre: {pre_result}, true: {true_result}")
+        logging.error(f"pre: {pre_result}, true: {true_result}")
 
         for clss in true_result:
             if clss == 1:
