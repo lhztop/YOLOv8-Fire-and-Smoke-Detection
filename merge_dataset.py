@@ -264,8 +264,8 @@ class SmokeFireBenchmark(object):
             self._model = YOLO(model)
         else:
             from transformers import ViTImageProcessor, ViTForImageClassification
-            image_processor = ViTImageProcessor.from_pretrained(model)
-            model = ViTForImageClassification.from_pretrained(model)
+            image_processor = ViTImageProcessor.from_pretrained(model, device="auto")
+            model = ViTForImageClassification.from_pretrained(model, device_map="auto")
             self._model = (image_processor, model)
 
     def get_yolo_label(self, val_dir:str=None):
