@@ -328,7 +328,7 @@ class SmokeFireBenchmark(object):
             ret.add(1)
         return ret
 
-    def calc_single_pre_true_score(self, pre_result, true_result, merge_smoke_fire_2_fire:bool=True):
+    def _prepare_result(self, pre_result, true_result, merge_smoke_fire_2_fire:bool=True):
         if 1 in true_result and len(true_result) > 1:
             logging.error("default contains smoke or fire in true")
             true_result.remove(1)
@@ -341,6 +341,14 @@ class SmokeFireBenchmark(object):
                 true_result.remove(2)
             if 0 in pre_result and 2 in pre_result:
                 pre_result.remove(2)
+            if 2 in pre_result:
+                pre_result.remove(2)
+                pre_result.add(0)
+            if 2 in true_result:
+                true_result.remove(2)
+                true_result.add(0)
+    def calc_single_pre_true_score(self, pre_result, true_result, merge_smoke_fire_2_fire:bool=True):
+        self._prepare_result(pre_result, true_result, merge_smoke_fire_2_fire)
         logging.error(f"pre: {pre_result}, true: {true_result}")
 
         for clss in true_result:
