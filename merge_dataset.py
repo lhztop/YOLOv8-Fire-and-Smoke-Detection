@@ -257,7 +257,7 @@ class SmokeFireBenchmark(object):
     total_false:int = 0
 
 
-    def __init__(self, model:str = "train/best.pt", score_threshold: float = 0.45, model_type: Literal["yolo", "google-vit"] = "yolo"):
+    def __init__(self, model:str = "train/best.pt", score_threshold: float = 0.3, model_type: Literal["yolo", "google-vit"] = "yolo"):
         self._score_threshold = score_threshold
         if model_type == "yolo":
             from ultralytics import YOLO
