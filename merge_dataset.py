@@ -341,6 +341,7 @@ class SmokeFireBenchmark(object):
                 true_result.remove(2)
             if 0 in pre_result and 2 in pre_result:
                 pre_result.remove(2)
+        print(f"pre: {pre_result}, true: {true_result}")
 
         for clss in true_result:
             if clss == 1:
@@ -381,7 +382,7 @@ class SmokeFireBenchmark(object):
                 pred_result = self.get_yolo_predict(f)
             true_result = yolo_val[label_file_name]
             self.calc_single_pre_true_score(pred_result, true_result)
-        print(f" tp+tn should = total true, {self.tp+self.fn} = {self.total_true}, {self.tp + self.fn == self.total_true }")
+        print(f" tp+fn should = total true, {self.tp+self.fn} = {self.total_true}, {self.tp + self.fn == self.total_true }")
         header = ["Accuracy", "Precision", "Recall", "F1-score"]
         value = [(self.tp + self.tn) / (self.total_true + self.total_false), self.tp/(self.tp + self.fp), self.tp/self.total_true]
         value.append(2*value[1]*value[2]/(value[1] + value[2]))  # f1 = 2p*r/p+r = 2/(1/p+1/r)
